@@ -24,7 +24,9 @@ import android.view.View;
 
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.util.MimeTypes;
 import com.google.android.exoplayer2.util.Util;
 
 
@@ -50,12 +52,29 @@ public class PlayerActivity extends AppCompatActivity {
   }
 
   private void initializePlayer() {
-    player = new SimpleExoPlayer.Builder(this).build();
+
+    if (player == null) {
+      DefaultTrackSelector trackSelector = new DefaultTrackSelector(this);
+      trackSelector.setParameters(
+              trackSelector.buildUponParameters().setMaxVideoSizeSd()
+      );
+      player = new SimpleExoPlayer.Builder(this)
+              .setTrackSelector(trackSelector)
+              .build();
+    }
+
+    // Simple implementation of exo player builder.
+//    player = new SimpleExoPlayer.Builder(this).build();
+
     playerView.setPlayer(player);
 
     //Media item that playing a video
-    MediaItem mediaItem = MediaItem.fromUri(getString(R.string.media_url_mp4));
+//    MediaItem mediaItem = MediaItem.fromUri(getString(R.string.media_url_mp4));
 
+    MediaItem mediaItem = new MediaItem.Builder()
+            .setUri(getString(R.string.media_url_dash))
+            .setMimeType(MimeTypes.APPLICATION_MPD)
+            .build();
 
     player.setMediaItem(mediaItem);
 
